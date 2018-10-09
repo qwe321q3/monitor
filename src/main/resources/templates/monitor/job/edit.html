@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-job-edit" th:object="${job}">
+			<input id="jobId" name="jobId" type="hidden" th:field="*{jobId}"/>
+			<input id="status" name="status" type="hidden" th:field="*{status}"/>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">任务名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="jobName" id="jobName" th:field="*{jobName}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">任务组名：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="jobGroup" id="jobGroup" th:field="*{jobGroup}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">方法名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="methodName" id="methodName" th:field="*{methodName}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">方法参数：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="methodParams" id="methodParams" th:field="*{methodParams}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">cron表达式：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="cronExpression" id="cronExpression" th:field="*{cronExpression}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">执行策略：</label>
+				<div class="col-sm-8">
+					<label class="radio-box" id="tooltips-misfire_ignore_misfires"> <input type="radio" th:field="*{misfirePolicy}" name="misfirePolicy" value="1" /> 继续执行 </label>
+					<label class="radio-box" id="tooltips-misfire_fire_and_proceed"> <input type="radio" th:field="*{misfirePolicy}" name="misfirePolicy" value="2" /> 一次执行 </label>
+					<label class="radio-box" id="tooltips-misfire_do_nothing"> <input type="radio" th:field="*{misfirePolicy}" name="misfirePolicy" value="3" /> 放弃执行 </label>
+				</div>
+			</div>
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">状态：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<label class="radio-box"> <input type="radio" name="status" value="0" th:field="*{status}" /> 正常 </label>-->
+					<!--<label class="radio-box"> <input type="radio" name="status" value="1" th:field="*{status}" /> 暂停 </label>-->
+					<!--&lt;!&ndash;<div class="radio-box" th:each="dict : ${@dict.getType('sys_job_status')}">&ndash;&gt;-->
+						<!--&lt;!&ndash;<input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:field="*{status}">&ndash;&gt;-->
+						<!--&lt;!&ndash;<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>&ndash;&gt;-->
+					<!--&lt;!&ndash;</div>&ndash;&gt;-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" class="form-control">[[*{remark}]]</textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="form-control-static col-sm-offset-9">
+					<button type="submit" class="btn btn-primary">提交</button>
+					<button onclick="$.modal.close()" class="btn btn-danger" type="button">关闭</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript">
+		var prefix = ctx + "monitor/job"
+
+		$("#form-job-edit").validate({
+			rules:{
+				jobName:{
+					required:true,
+				},
+				jobGroup:{
+					required:true,
+				},
+				cronExpression:{
+					required:true,
+				},
+			},
+			submitHandler:function(form){
+				$.operate.save(prefix + "/edit", $('#form-job-edit').serialize());
+			}
+		});
+
+        $('#tooltips-misfire_ignore_misfires').pt({
+            position: 'b',
+            content: '1、以错过的第一个频率时间立刻开始执行,<br/>' +
+            '2、重做错过的所有频率周期后,<br/>' +
+            '3、当下一次触发频率发生时间大于当前时间后，再按照正常的Cron频率依次执行'
+        });
+
+        $('#tooltips-misfire_fire_and_proceed').pt({
+            position: 'b',
+            content: '1、以当前时间为触发频率立刻触发一次执行,<br/>' +
+            '2、然后按照Cron频率依次执行'
+        });
+
+        $('#tooltips-misfire_do_nothing').pt({
+            position: 'b',
+            content: '1、不触发立即执行,<br/>' +
+            '2、等待下次Cron触发频率到达时刻开始按照Cron频率依次执行'
+        });
+	</script>
+</body>
+</html>
